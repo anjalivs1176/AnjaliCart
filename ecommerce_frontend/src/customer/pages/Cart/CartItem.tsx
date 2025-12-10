@@ -8,7 +8,7 @@ const CartItem = ({ item }: any) => {
     try {
       const token = localStorage.getItem("token") || "";
 
-      await fetch(`http://localhost:8080/api/cart/item/${item.id}`, {
+      await fetch(`${process.env.REACT_APP_API_URL}/api/cart/item/${item.id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -29,7 +29,7 @@ const CartItem = ({ item }: any) => {
     try {
       const token = localStorage.getItem("token") || "";
 
-      const res = await fetch(`http://localhost:8080/api/cart/item/${item.id}`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/cart/item/${item.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

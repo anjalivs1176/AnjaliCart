@@ -18,7 +18,7 @@ const OrderDetails = () => {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        `http://localhost:8080/api/orders/${orderId}`,
+        `${process.env.REACT_APP_API_URL}/api/orders/${orderId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -57,7 +57,7 @@ const OrderDetails = () => {
       const token = localStorage.getItem("token");
 
       await axios.put(
-        `http://localhost:8080/api/orders/${order.id}/cancel`,
+        `${process.env.REACT_APP_API_URL}/api/orders/${order.id}/cancel`,
         {},
         {
           headers: {

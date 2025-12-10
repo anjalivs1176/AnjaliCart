@@ -15,7 +15,7 @@ const RegisterForm = () => {
     setErrorMsg("");
 
     try {
-      await axios.post("http://localhost:8080/auth/send/login-signup-otp", {
+      await axios.post("${process.env.REACT_APP_API_URL}/auth/send/login-signup-otp", {
         email,
         role: "ROLE_CUSTOMER"
       });
@@ -31,7 +31,7 @@ const RegisterForm = () => {
     setErrorMsg("");
 
     try {
-      const res = await axios.post("http://localhost:8080/auth/signup", {
+      const res = await axios.post("${process.env.REACT_APP_API_URL}/auth/signup", {
         name,
         email,
         mobile,

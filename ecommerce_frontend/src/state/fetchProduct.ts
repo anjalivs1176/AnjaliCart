@@ -1,6 +1,6 @@
 import axios from "axios"
 
-const api="http://localhost:8080/products"
+const api="${process.env.REACT_APP_API_URL}/products"
 export const fetchProducts = async()=>{
     try{
         const response=await axios.get(api)

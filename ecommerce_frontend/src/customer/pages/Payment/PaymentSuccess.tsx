@@ -19,7 +19,7 @@ const PaymentSuccess = () => {
         const token = localStorage.getItem("token") || "";
 
         const res = await fetch(
-          `http://localhost:8080/api/payment/${paymentId}?paymentLinkId=${linkId}`,
+          `${process.env.REACT_APP_API_URL}/api/payment/${paymentId}?paymentLinkId=${linkId}`,
           {
             method: "GET",
             headers: {

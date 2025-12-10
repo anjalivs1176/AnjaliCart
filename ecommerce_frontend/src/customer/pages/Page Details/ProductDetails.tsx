@@ -86,7 +86,7 @@ const ProductDetails = () => {
     try {
       const token = localStorage.getItem("token") || "";
 
-      const res = await fetch("http://localhost:8080/api/cart", {
+      const res = await fetch("${process.env.REACT_APP_API_URL}/api/cart", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -116,7 +116,7 @@ const ProductDetails = () => {
         quantity,
       };
 
-      const res = await fetch("http://localhost:8080/api/cart/add", {
+      const res = await fetch("${process.env.REACT_APP_API_URL}/api/cart/add", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -138,7 +138,7 @@ const ProductDetails = () => {
       if (!product.product?.id) return;
 
       const token = localStorage.getItem("token") || "";
-      const res = await fetch("http://localhost:8080/api/wishlist", {
+      const res = await fetch("${process.env.REACT_APP_API_URL}/api/wishlist", {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -163,7 +163,7 @@ const ProductDetails = () => {
       const token = localStorage.getItem("token") || "";
 
       const res = await fetch(
-        `http://localhost:8080/api/wishlist/add-product/${product.product.id}`,
+        `${process.env.REACT_APP_API_URL}/api/wishlist/add-product/${product.product.id}`,
         {
           method: "POST",
           headers: {

@@ -61,7 +61,7 @@ const SellerAccountForm = () => {
 
   const handleCreateAccount = async (values: any) => {
     try {
-      const res = await fetch("http://localhost:8080/seller", {
+      const res = await fetch("${process.env.REACT_APP_API_URL}/seller", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

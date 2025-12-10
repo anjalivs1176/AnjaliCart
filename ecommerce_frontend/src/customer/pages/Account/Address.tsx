@@ -8,7 +8,7 @@ const Address = () => {
   const fetchAddresses = async () => {
     try {
       const token = localStorage.getItem('token')
-      const res = await axios.get('http://localhost:8080/api/address', {
+      const res = await axios.get('${process.env.REACT_APP_API_URL}/api/address', {
         headers: { Authorization: `Bearer ${token}` }
       })
       setAddresses(res.data)

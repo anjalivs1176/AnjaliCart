@@ -36,7 +36,7 @@ const AddressForm = ({ onSave, onClose }: any) => {
         const token = localStorage.getItem("token");
 
         const res = await axios.post(
-          "http://localhost:8080/api/address",
+          "${process.env.REACT_APP_API_URL}/api/address",
           values,
           {
             headers: {

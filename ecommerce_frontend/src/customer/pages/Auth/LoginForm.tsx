@@ -13,7 +13,7 @@ const LoginForm = () => {
     setErrorMsg("");
 
     try {
-      await axios.post("http://localhost:8080/auth/send/login-signup-otp", {
+      await axios.post("${process.env.REACT_APP_API_URL}/auth/send/login-signup-otp", {
         email: "signin_" + email,
         role: "ROLE_CUSTOMER"
       });
@@ -27,7 +27,7 @@ const LoginForm = () => {
   };
   const handleLogin = async () => {
     try {
-      const res = await axios.post("http://localhost:8080/auth/signing", {
+      const res = await axios.post("${process.env.REACT_APP_API_URL}/auth/signing", {
         email,
         otp,
         role: "ROLE_CUSTOMER"
