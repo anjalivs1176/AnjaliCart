@@ -15,7 +15,7 @@ import java.util.List;
 public class Product {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
 
     private String title;
@@ -53,7 +53,7 @@ public class Product {
     private String sizes;
 
     //one product have many reviews
-    @OneToMany(mappedBy = "product",cascade = CascadeType.ALL ,orphanRemoval = true)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 
 }

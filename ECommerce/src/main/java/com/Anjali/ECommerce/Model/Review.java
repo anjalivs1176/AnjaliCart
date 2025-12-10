@@ -26,8 +26,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @EqualsAndHashCode
 public class Review {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
 
     @Column(nullable = false)

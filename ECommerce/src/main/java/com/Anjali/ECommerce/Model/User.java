@@ -35,7 +35,7 @@ import lombok.Setter;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
 
     private String name;
@@ -56,7 +56,6 @@ public class User {
     @ManyToMany(fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Coupons> usedCoupons = new ArrayList<>();
-
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Cart cart;

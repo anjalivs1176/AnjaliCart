@@ -20,7 +20,7 @@ import lombok.Setter;
 // @EqualsAndHashCode
 // public class Category {
 //     @Id
-//     @GeneratedValue(strategy = GenerationType.AUTO)
+//     @GeneratedValue(strategy = GenerationType.IDENTITY)
 //     private Long Id;
 //     private String name;
 //     @Column(unique = true)

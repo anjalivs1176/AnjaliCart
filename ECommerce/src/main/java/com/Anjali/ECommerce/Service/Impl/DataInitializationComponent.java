@@ -11,9 +11,9 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class DataInitializationComponent implements CommandLineRunner {
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
 
     @Override
     public void run(String... args) throws Exception {
@@ -23,7 +23,7 @@ public class DataInitializationComponent implements CommandLineRunner {
     private void initializeAdminUser() {
         String adminUsername = "anjalivs.dev@gmail.com";
 
-        if(userRepository.findByEmail(adminUsername)==null){
+        if (userRepository.findByEmail(adminUsername) == null) {
             User adminUser = new User();
 
             adminUser.setPassword(passwordEncoder.encode("codewithanjali"));

@@ -16,7 +16,7 @@ import lombok.*;
 public class HomeCategory {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
@@ -25,6 +25,6 @@ public class HomeCategory {
     private HomeCategorySection section;
 
     private String title;
-private Integer discount;
+    private Integer discount;
 
 }

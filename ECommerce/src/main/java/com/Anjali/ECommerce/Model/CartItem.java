@@ -13,7 +13,7 @@ import lombok.*;
 public class CartItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
 
     @ManyToOne
@@ -25,12 +25,11 @@ public class CartItem {
 
     private String size;
 
-    private int quantity=1;
+    private int quantity = 1;
 
     private Integer mrpPrice;
     private Integer sellingPrice;
 
     private Long UserId;
-
 
 }

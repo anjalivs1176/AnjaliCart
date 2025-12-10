@@ -12,8 +12,9 @@ import java.util.HashSet;
 @NoArgsConstructor
 @EqualsAndHashCode
 public class Wishlist {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne
