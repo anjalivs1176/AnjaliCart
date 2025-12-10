@@ -33,6 +33,7 @@ public class AppConfig {
                         -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/public/**").permitAll()
                 // Public GET endpoints
                 .requestMatchers(HttpMethod.GET, "/api/home/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/deals/**").permitAll()
