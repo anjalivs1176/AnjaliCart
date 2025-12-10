@@ -1,6 +1,8 @@
 package com.Anjali.ECommerce.config;
 
-import jakarta.servlet.http.HttpServletRequest;
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,8 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-import java.util.Collections;
-import java.util.List;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Configuration                 // 💡 Marks this as a configuration class (used by Spring during startup)
 @EnableWebSecurity             // 💡 Enables Spring Security in the application
@@ -37,15 +38,16 @@ public class AppConfig {
                         -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                // Customer public
-                .requestMatchers("/api/home").permitAll()
-                .requestMatchers("/api/deals/**").permitAll()
-                .requestMatchers("/api/categories/**").permitAll()
-                //allow frontend to fetch home grid without login
-                .requestMatchers("/api/public/**").permitAll()
-                // Seller authentication
+                // Public GET endpoints for homepage
+                .requestMatchers(HttpMethod.GET, "/api/home/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/deals/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/home-categories/**").permitAll()
+                // Authentication routes
                 .requestMatchers("/api/seller/**").permitAll()
-                // Admin authentication
+                .requestMatchers("/api/auth/**").permitAll()
+                // Admin routes
                 .requestMatchers("/api/admin/**").authenticated()
                 // Everything else under API requires login
                 .requestMatchers("/api/**").authenticated()
@@ -63,9 +65,10 @@ public class AppConfig {
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                 CorsConfiguration cfg = new CorsConfiguration();
 
-                // ✅ Allow all origins (*) – can be replaced with a specific domain for security
-                //cfg.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
-                cfg.setAllowedOriginPatterns(List.of("http://localhost:3000"));
+                cfg.setAllowedOriginPatterns(List.of(
+                        "http://localhost:3000",
+                        "https://anjalicart.netlify.app"
+                ));
 
                 // ✅ Allow all HTTP methods (GET, POST, PUT, DELETE, etc.)
                 cfg.setAllowedMethods(Collections.singletonList("*"));

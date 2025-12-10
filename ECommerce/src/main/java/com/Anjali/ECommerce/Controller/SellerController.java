@@ -70,7 +70,9 @@ public class SellerController {
         // URL encode email
         String encodedEmail = URLEncoder.encode(savedSeller.getEmail(), StandardCharsets.UTF_8);
 
-        String verifyUrl = "http://localhost:3000/verify-seller/" + encodedEmail + "/" + otp;
+        String verifyUrl = "https://anjalicart.netlify.app/verify-seller/" 
+                    + encodedEmail + "/" + otp;
+
 
         String subject = "AnjaliCart Seller Email Verification";
         String text = "Welcome to AnjaliCart! Your OTP: " + otp + "\n\nVerify here:\n" + verifyUrl;
