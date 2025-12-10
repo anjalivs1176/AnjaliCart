@@ -19,15 +19,10 @@ import org.springframework.web.cors.CorsConfigurationSource;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-@Configuration                 // 💡 Marks this as a configuration class (used by Spring during startup)
-@EnableWebSecurity             // 💡 Enables Spring Security in the application
+@Configuration
+@EnableWebSecurity
 public class AppConfig {
 
-    /**
-     * 💡 Main security configuration method This defines how Spring Security
-     * will protect all HTTP endpoints. We’re using a stateless setup with JWT
-     * authentication (no sessions).
-     */
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
 
@@ -38,18 +33,21 @@ public class AppConfig {
                         -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                // Public GET endpoints for homepage
+                // Public GET endpoints
                 .requestMatchers(HttpMethod.GET, "/api/home/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/deals/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/home-categories/**").permitAll()
-                // Authentication routes
-                .requestMatchers("/api/seller/**").permitAll()
-                .requestMatchers("/api/auth/**").permitAll()
-                // Admin routes
+                // PUBLIC AUTH ENDPOINTS
+                .requestMatchers("/api/auth/**").permitAll() // customer login/register
+                .requestMatchers("/api/seller/**").permitAll() // seller login/register
+
+                // ALLOW ADMIN LOGIN PUBLICLY (VERY IMPORTANT)
+                .requestMatchers("/api/admin/login").permitAll()
+                // All other admin routes — authenticated
                 .requestMatchers("/api/admin/**").authenticated()
-                // Everything else under API requires login
+                // All other API routes — authenticated
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
                 )
@@ -58,6 +56,7 @@ public class AppConfig {
         return http.build();
     }
 
+    // CORS FIXED FOR NETLIFY + LOCALHOST
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         return new CorsConfigurationSource() {
@@ -67,22 +66,14 @@ public class AppConfig {
 
                 cfg.setAllowedOriginPatterns(List.of(
                         "http://localhost:3000",
-                        "https://anjalicart.netlify.app"
+                        "https://anjalicart.netlify.app",
+                        "https://anjalicart.onrender.com"
                 ));
 
-                // ✅ Allow all HTTP methods (GET, POST, PUT, DELETE, etc.)
                 cfg.setAllowedMethods(Collections.singletonList("*"));
-
-                // ✅ Allow all headers (Authorization, Content-Type, etc.)
                 cfg.setAllowedHeaders(Collections.singletonList("*"));
-
-                // ✅ Allow credentials (e.g., cookies or Authorization headers)
                 cfg.setAllowCredentials(true);
-
-                // ✅ Expose specific headers to frontend (like Authorization)
                 cfg.setExposedHeaders(Collections.singletonList("Authorization"));
-
-                // ✅ Set how long the CORS configuration can be cached by the browser (in seconds)
                 cfg.setMaxAge(3600L);
 
                 return cfg;
@@ -90,19 +81,11 @@ public class AppConfig {
         };
     }
 
-    /**
-     * 💡 PasswordEncoder bean Used by Spring Security for hashing passwords
-     * (e.g., during registration or login validation).
-     */
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    /**
-     * 💡 RestTemplate bean Used when you need to make REST API calls from your
-     * backend (e.g., calling an external API).
-     */
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
