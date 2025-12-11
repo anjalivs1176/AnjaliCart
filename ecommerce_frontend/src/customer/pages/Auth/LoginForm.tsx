@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-
+import api from "../../../config/api"; 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [otpSent, setOtpSent] = useState(false);
@@ -16,7 +16,7 @@ const handleSendOtp = async () => {
   const isAdmin = email === "anjalivs.dev@gmail.com";
 
   try {
-    await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/send/login-signup-otp`, {
+    await api.post("/api/auth/send/login-signup-otp", {
       email: isAdmin ? email : "signin_" + email,
       role: isAdmin ? "ROLE_ADMIN" : "ROLE_CUSTOMER"
     });
@@ -34,11 +34,12 @@ const handleLogin = async () => {
   const isAdmin = email === "anjalivs.dev@gmail.com";
 
   try {
-    const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/signing`, {
+    const res = await api.post("/api/auth/signing", {
       email: isAdmin ? email : "signin_" + email,
       otp,
       role: isAdmin ? "ROLE_ADMIN" : "ROLE_CUSTOMER"
     });
+
 
     const { jwt, role, id, name, profileImage } = res.data;
 
