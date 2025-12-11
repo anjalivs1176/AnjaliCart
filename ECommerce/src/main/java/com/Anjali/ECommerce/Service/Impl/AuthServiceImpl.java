@@ -1,5 +1,19 @@
 package com.Anjali.ECommerce.Service.Impl;
 
+import java.util.Collection;
+import java.util.List;
+
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.Anjali.ECommerce.Domain.USER_ROLE;
 import com.Anjali.ECommerce.Model.Cart;
 import com.Anjali.ECommerce.Model.Seller;
@@ -16,20 +30,9 @@ import com.Anjali.ECommerce.config.JwtProvider;
 import com.Anjali.ECommerce.response.AuthResponse;
 import com.Anjali.ECommerce.response.SignupRequest;
 import com.Anjali.ECommerce.utils.OtpUtil;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.List;
+import jakarta.mail.MessagingException;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -81,10 +84,9 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(email);
 
         if (user == null) {
-            // New user → auto signup
             user = new User();
             user.setEmail(email);
-            user.setRole(role); // pass USER_ROLE.CUSTOMER when calling
+            user.setRole(role);
             userRepository.save(user);
         }
 
@@ -99,13 +101,17 @@ public class AuthServiceImpl implements AuthService {
         vc.setOtp(otp);
         verificationCodeRepository.save(vc);
 
-        // Send email
-        emailService.sendVerificationOtpEmail(
-                email,
-                otp,
-                "AnjaliCart Login/Signup OTP",
-                "Your OTP is: " + otp
-        );
+        // Send email safely
+        try {
+            emailService.sendVerificationOtpEmail(
+                    email,
+                    otp,
+                    "AnjaliCart Login/Signup OTP",
+                    "Your OTP is: " + otp
+            );
+        } catch (MessagingException e) {
+            throw new RuntimeException("Failed to send OTP email", e);
+        }
 
         return "OTP sent";
     }
