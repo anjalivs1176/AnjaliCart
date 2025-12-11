@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import api from "../../../config/api"; 
+import api from "../../../config/api";
+
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [otpSent, setOtpSent] = useState(false);
@@ -10,75 +11,72 @@ const LoginForm = () => {
   const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
 
-const handleSendOtp = async () => {
-  setErrorMsg("");
+  // ADMIN EMAIL
+  const ADMIN_EMAIL = "anjalivs.dev@gmail.com";
 
-  const isAdmin = email === "anjalivs.dev@gmail.com";
+  const handleSendOtp = async () => {
+    setErrorMsg("");
 
-  try {
-    await api.post("/api/auth/send/login-signup-otp", {
-      email: isAdmin ? email : "signin_" + email,
-      role: isAdmin ? "ROLE_ADMIN" : "ROLE_CUSTOMER"
-    });
+    const isAdmin = email === ADMIN_EMAIL;
 
-    setOtpSent(true);
+    try {
+      await api.post("/api/auth/send/login-signup-otp", {
+        email: email,                         // FIXED
+        role: isAdmin ? "ROLE_ADMIN" : "ROLE_CUSTOMER"
+      });
 
-  } catch (error: any) {
-    const msg = error.response?.data?.message || "Something went wrong";
-    setErrorMsg(msg);
-  }
-};
+      setOtpSent(true);
 
-
-const handleLogin = async () => {
-  const isAdmin = email === "anjalivs.dev@gmail.com";
-
-  try {
-    const res = await api.post("/api/auth/signing", {
-      email: isAdmin ? email : "signin_" + email,
-      otp,
-      role: isAdmin ? "ROLE_ADMIN" : "ROLE_CUSTOMER"
-    });
+    } catch (error: any) {
+      const msg = error.response?.data?.message || "Something went wrong!";
+      setErrorMsg(msg);
+    }
+  };
 
 
-    const { jwt, role, id, name, profileImage } = res.data;
+  const handleLogin = async () => {
+    const isAdmin = email === ADMIN_EMAIL;
 
-    localStorage.setItem("token", jwt);
-    localStorage.setItem("role", role);
+    try {
+      const res = await api.post("/api/auth/signing", {
+        email: email,                  // FIXED
+        otp,
+        role: isAdmin ? "ROLE_ADMIN" : "ROLE_CUSTOMER"
+      });
 
-    localStorage.setItem(
-      "user",
-      JSON.stringify({
-        id,
-        name,
-        profileImage: profileImage || null,
-      })
-    );
+      const { jwt, role, id, name, profileImage } = res.data;
 
-    window.dispatchEvent(new Event("authChange"));
+      localStorage.setItem("token", jwt);
+      localStorage.setItem("role", role);
 
-    if (role === "ROLE_ADMIN") navigate("/admin");
-    else if (role === "ROLE_SELLER") navigate("/seller");
-    else navigate("/");
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          id,
+          name,
+          profileImage: profileImage || null,
+        })
+      );
 
-  } catch (error: any) {
-    const msg = error.response?.data?.message || "Invalid OTP!";
-    setErrorMsg(msg);
-  }
-};
+      window.dispatchEvent(new Event("authChange"));
 
+      if (role === "ROLE_ADMIN") navigate("/admin");
+      else if (role === "ROLE_SELLER") navigate("/seller");
+      else navigate("/");
 
-
+    } catch (error: any) {
+      const msg = error.response?.data?.message || "Invalid OTP!";
+      setErrorMsg(msg);
+    }
+  };
 
   return (
     <div>
       <h1 className='text-xl font-semibold mb-4'>Login</h1>
 
-
       {errorMsg && (
         <p className="text-red-600 text-sm mb-3">{errorMsg}</p>
       )}
-
 
       <input
         type="email"
@@ -90,7 +88,6 @@ const handleLogin = async () => {
           setErrorMsg("");
         }}
       />
-
 
       {!otpSent && (
         <Button
