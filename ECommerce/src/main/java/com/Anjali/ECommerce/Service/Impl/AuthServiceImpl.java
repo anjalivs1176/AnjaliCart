@@ -31,7 +31,6 @@ import com.Anjali.ECommerce.response.AuthResponse;
 import com.Anjali.ECommerce.response.SignupRequest;
 import com.Anjali.ECommerce.utils.OtpUtil;
 
-import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -109,7 +108,7 @@ public class AuthServiceImpl implements AuthService {
                     "AnjaliCart Login/Signup OTP",
                     "Your OTP is: " + otp
             );
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Failed to send OTP email", e);
         }
 
@@ -166,7 +165,6 @@ public class AuthServiceImpl implements AuthService {
         Authentication authentication = authenticate(username, otp);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // String token = jwtProvider.generateToken(authentication);
         String token = jwtProvider.generateToken(authentication);
 
         AuthResponse authResponse = new AuthResponse();
@@ -206,7 +204,6 @@ public class AuthServiceImpl implements AuthService {
         if (userDetails == null) {
             Seller seller = sellerRepository.findByEmail(username);
             if (seller != null) {
-                // build UserDetails for seller (no password needed for OTP flow)
                 userDetails = org.springframework.security.core.userdetails.User
                         .withUsername(username)
                         .password("") // not used in OTP flow
@@ -221,7 +218,7 @@ public class AuthServiceImpl implements AuthService {
             throw new BadCredentialsException("Invalid username");
         }
 
-        // Retrieve verification codes (repository returns list — pick latest)
+        // Retrieve verification codes (pick latest)
         List<VerificationCode> codes = verificationCodeRepository.findByEmail(username);
         VerificationCode vc = (codes == null || codes.isEmpty()) ? null : codes.get(codes.size() - 1);
 
