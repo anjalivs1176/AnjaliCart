@@ -75,31 +75,23 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public String sendLoginAndSignupOtp(String email, USER_ROLE role) throws Exception {
+    public String sendLoginAndSignupOtp(String email, USER_ROLE role) {
 
-        String SIGNIN_PREFIX = "signin_";
-        boolean isLogin = false;
+        // Check if user exists
+        User user = userRepository.findByEmail(email);
 
-        if (email.startsWith(SIGNIN_PREFIX)) {
-            isLogin = true;
-            email = email.substring(SIGNIN_PREFIX.length());
-
-            User user = userRepository.findByEmail(email);
-            if (user == null) {
-                throw new Exception("User doesn't exist with this email");
-            }
+        if (user == null) {
+            // New user → auto signup
+            user = new User();
+            user.setEmail(email);
+            user.setRole(role); // pass USER_ROLE.CUSTOMER when calling
+            userRepository.save(user);
         }
 
-        if (!isLogin) {
-            User existingUser = userRepository.findByEmail(email);
-            if (existingUser != null) {
-                throw new Exception("User already exists with this email");
-            }
-        }
-
-        // Delete existing OTP(s)
+        // Delete old OTP
         verificationCodeRepository.deleteByEmail(email);
 
+        // Generate new OTP
         String otp = OtpUtil.generateOtp();
 
         VerificationCode vc = new VerificationCode();
@@ -107,6 +99,7 @@ public class AuthServiceImpl implements AuthService {
         vc.setOtp(otp);
         verificationCodeRepository.save(vc);
 
+        // Send email
         emailService.sendVerificationOtpEmail(
                 email,
                 otp,
@@ -114,7 +107,7 @@ public class AuthServiceImpl implements AuthService {
                 "Your OTP is: " + otp
         );
 
-        return SIGNIN_PREFIX;
+        return "OTP sent";
     }
 
     @Override
