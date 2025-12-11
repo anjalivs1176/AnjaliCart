@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { api } from "../../config/api";
+import api from "../../config/api";
 
 interface SellerState {
   seller: any;
@@ -19,12 +19,16 @@ export const fetchSellerProfile = createAsyncThunk(
   "seller/fetchSellerProfile",
   async (jwt: string, { rejectWithValue }) => {
     try {
-      const response = await api.get("/seller/profile", {
+      const response = await api.get("/api/seller/profile", {
         headers: { Authorization: `Bearer ${jwt}` },
       });
+
       return response.data;
+
     } catch (error: any) {
-      return rejectWithValue(error.response?.data || "Failed to fetch seller");
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch seller"
+      );
     }
   }
 );

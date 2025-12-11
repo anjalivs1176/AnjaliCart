@@ -1,4 +1,4 @@
-
+import api from "../../../config/api"
 import React, { useEffect } from "react";
 import { useSearchParams, useParams, useNavigate } from "react-router-dom";
 
@@ -14,30 +14,22 @@ const PaymentSuccess = () => {
   useEffect(() => {
     if (!paymentId || !linkId) return;
 
-    const confirmPayment = async () => {
-      try {
-        const token = localStorage.getItem("token") || "";
 
-        const res = await fetch(
-          `${process.env.REACT_APP_API_URL}/api/payment/${paymentId}?paymentLinkId=${linkId}`,
-          {
-            method: "GET",
-            headers: {
-              "Authorization": `Bearer ${token}`,
-            },
-          }
-        );
+const confirmPayment = async () => {
+  try {
+    const res = await api.get(`/api/payment/${paymentId}?paymentLinkId=${linkId}`);
 
-        if (res.ok) {
-          console.log("PAYMENT VERIFIED🔥");
-          setTimeout(() => navigate("/account/orders"), 2000);
-        } else {
-          console.log("Payment verification failed");
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    };
+    if (res.status === 200) {
+      console.log("PAYMENT VERIFIED🔥");
+      setTimeout(() => navigate("/account/orders"), 2000);
+    } else {
+      console.log("Payment verification failed");
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 
     confirmPayment();
   }, [paymentId, linkId, navigate]);

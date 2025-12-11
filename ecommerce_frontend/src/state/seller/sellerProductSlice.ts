@@ -1,12 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api } from "../../config/api";
+import api from "../../config/api";
 import { Product } from "../../type/productType";
 
 export const fetchSellerProducts = createAsyncThunk<Product[]>(
   "sellerProduct/fetchSellerProducts",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get("/sellers/products");
+      const response = await api.get("/api/sellers/products");
       return response.data;
     } catch (error) {
       return rejectWithValue("Failed to load products");
@@ -18,7 +18,7 @@ export const createProduct = createAsyncThunk(
   "sellerProduct/createProduct",
   async ({ request }: any, { rejectWithValue }) => {
     try {
-      const response = await api.post("/sellers/products", request);
+      const response = await api.post("/api/sellers/products", request);
       return response.data;
     } catch (error) {
       return rejectWithValue("Failed to create product");
@@ -30,18 +30,19 @@ export const updateProduct = createAsyncThunk(
   "sellerProduct/updateProduct",
   async ({ productId, request }: any, { rejectWithValue }) => {
     try {
-      const response = await api.put(`/sellers/products/${productId}`, request);
+      const response = await api.put(`/api/sellers/products/${productId}`, request);
       return response.data;
     } catch (err) {
       return rejectWithValue("Failed to update product");
     }
   }
 );
+
 export const deleteProduct = createAsyncThunk(
   "sellerProduct/deleteProduct",
   async (productId: number, { rejectWithValue }) => {
     try {
-      await api.delete(`/sellers/products/${productId}`);
+      await api.delete(`/api/sellers/products/${productId}`);
       return productId;
     } catch (error) {
       return rejectWithValue("Failed to delete product");
@@ -54,7 +55,7 @@ export const toggleStock = createAsyncThunk(
   async ({ productId, stockStatus }: any, { rejectWithValue }) => {
     try {
       const response = await api.put(
-        `/sellers/products/${productId}/stock`,
+        `/api/sellers/products/${productId}/stock`,
         { stockStatus }
       );
       return response.data;
@@ -63,6 +64,7 @@ export const toggleStock = createAsyncThunk(
     }
   }
 );
+
 
 interface SellerProductState {
   products: Product[];

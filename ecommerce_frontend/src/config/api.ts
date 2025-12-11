@@ -9,9 +9,9 @@ export const api = axios.create({
 
 // routes that MUST NOT get Authorization header
 const PUBLIC_ROUTES = [
-  "/auth",         
-  "/seller/login",
-  "/seller/verify",
+  "/api/auth",         
+  "/api/seller/login",
+  "/api/seller/verify",
 ];
 
 api.interceptors.request.use((config) => {

@@ -1,4 +1,4 @@
-
+import api from "../../config/api"
 import React, { useState } from "react";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
@@ -59,27 +59,22 @@ const SellerAccountForm = () => {
     onSubmit: (values) => handleCreateAccount(values)
   });
 
-  const handleCreateAccount = async (values: any) => {
-    try {
-      const res = await fetch("${process.env.REACT_APP_API_URL}/api/seller", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
+const handleCreateAccount = async (values: any) => {
+  try {
+    const res = await api.post("/api/seller", values);
 
-      const data = await res.json();
-      console.log("SELLER CREATED:", data);
-      alert("Seller account created! Check your email for the verification link (it contains the OTP).");
+    console.log("SELLER CREATED:", res.data);
 
+    alert(
+      "Seller account created! Check your email for the verification link (it contains the OTP)."
+    );
 
+  } catch (error) {
+    console.log("Error creating seller:", error);
+    alert("Signup failed");
+  }
+};
 
-    } catch (error) {
-      console.log("Error creating seller:", error);
-      alert("Signup failed");
-    }
-  };
 
 
   const handleStep = (value: number) => {

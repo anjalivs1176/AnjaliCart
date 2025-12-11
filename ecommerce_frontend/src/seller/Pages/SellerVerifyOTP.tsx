@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
-
+import api from "../../config/api";
 const SellerVerifyOTP: React.FC = () => {
   const { email, otp } = useParams<{ email?: string; otp?: string }>();
   const navigate = useNavigate();
@@ -17,44 +17,32 @@ const SellerVerifyOTP: React.FC = () => {
     }
   }, [email, otp]);
 
-  const verify = async () => {
-    if (!email || !otp) {
-      setError("Invalid verification link.");
-      return;
-    }
+const verify = async () => {
+  if (!email || !otp) {
+    setError("Invalid verification link.");
+    return;
+  }
 
-    setLoading(true);
-    setError(null);
-    setStatusMessage(null);
+  setLoading(true);
+  setError(null);
+  setStatusMessage(null);
 
-    try {
-      const encodedEmail = encodeURIComponent(email);
-      const encodedOtp = encodeURIComponent(otp);
+  try {
+    const encodedEmail = encodeURIComponent(email);
+    const encodedOtp = encodeURIComponent(otp);
 
-      const url = `${process.env.REACT_APP_API_URL}/api/seller/verify/${encodedEmail}/${encodedOtp}`;
+    const res = await api.patch(`/api/seller/verify/${encodedEmail}/${encodedOtp}`);
 
-      const res = await fetch(url, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+    setStatusMessage("Email verified successfully 🎉 Redirecting to login...");
+    setTimeout(() => navigate("/become-seller"), 1500);
 
-      const body = await res.json().catch(() => null);
+  } catch (err: any) {
+    setError("Verification failed. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
-      if (res.ok) {
-        setStatusMessage("Email verified successfully 🎉 Redirecting to login...");
-        setTimeout(() => navigate("/become-seller"), 1500);
-      } else {
-        setError(body?.error || "Verification failed. Please try again.");
-      }
-
-    } catch (err: any) {
-      setError("Network error while verifying OTP");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <Box className="p-6 max-w-xl mx-auto">

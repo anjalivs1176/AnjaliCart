@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { api } from "../../config/api";
+import api from "../../config/api";
 
 export interface OrderItem {
   id: number;
@@ -34,23 +34,28 @@ const initialState: SellerTransactionsState = {
 };
 
 export const fetchSellerTransactions = createAsyncThunk<
-  Order[], 
-  void,    
+  Order[],
+  void,
   { rejectValue: string }
->("seller/fetchTransactions", async (_, { rejectWithValue }) => {
-  try {
-    const token = localStorage.getItem("token");
+>(
+  "seller/fetchTransactions",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
 
-    const res = await api.get("/api/seller/orders", {
-      headers: { Authorization: token },
-    });
-    return res.data.filter(
-      (order: Order) => order.orderStatus === "DELIVERED"
-    );
-  } catch (err) {
-    return rejectWithValue("Failed to load transactions");
+      const res = await api.get("/api/seller/orders", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      return res.data.filter(
+        (order: Order) => order.orderStatus === "DELIVERED"
+      );
+
+    } catch (err) {
+      return rejectWithValue("Failed to load transactions");
+    }
   }
-});
+);
 
 const sellerTransactionsSlice = createSlice({
   name: "sellerTransactions",

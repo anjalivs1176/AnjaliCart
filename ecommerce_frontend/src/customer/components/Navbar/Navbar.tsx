@@ -124,19 +124,19 @@ const Navbar = () => {
             )}
 
 
-            <IconButton onClick={() => navigate("/wishlist")}>
+            <IconButton onClick={() => navigate("/api/wishlist")}>
               <FavoriteBorderIcon sx={{ fontSize: 26 }} />
             </IconButton>
 
 
-            <IconButton onClick={() => navigate("/cart")}>
+            <IconButton onClick={() => navigate("/api/cart")}>
               <AddShoppingCartIcon sx={{ fontSize: 28 }} />
             </IconButton>
 
 
             {isLarge && (
               <Button
-                onClick={() => navigate("/become-seller")}
+                onClick={() => navigate("/api/become-seller")}
                 startIcon={<StorefrontIcon />}
                 variant="outlined"
                 className="px-4"

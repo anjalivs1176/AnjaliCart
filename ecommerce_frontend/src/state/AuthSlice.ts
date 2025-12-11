@@ -1,21 +1,26 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { api } from "../config/api";
+import api from "../config/api";   // ✅ FIXED IMPORT
+
+// ====================== SEND OTP ======================
 export const sendLoginSignupOtp = createAsyncThunk(
   "auth/sendLoginSignupOtp",
   async ({ email }: { email: string }, { rejectWithValue }) => {
     try {
-      const response = await api.post("/auth/send/login-signup-otp", {
+      const response = await api.post("/api/auth/send/login-signup-otp", {
         email,
         role: "ROLE_SELLER",
         otp: null,
       });
       return response.data;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || "Failed to send OTP");
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to send OTP"
+      );
     }
   }
 );
 
+// ====================== SELLER LOGIN ======================
 export const loginSeller = createAsyncThunk(
   "auth/loginSeller",
   async (
@@ -23,7 +28,7 @@ export const loginSeller = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await api.post("/seller/login", {
+      const response = await api.post("/api/seller/login", {
         email,
         password,
       });
@@ -37,33 +42,34 @@ export const loginSeller = createAsyncThunk(
   }
 );
 
-
-
-
-export const signin = createAsyncThunk<any,any>("/auth/signin",
-  async(loginRequest,{rejectWithValue})=>{
-    try{
-      const response = await api.post("/auth/signin",loginRequest)
-      console.log("Login otp", response.data)
-    } catch(error){
-      console.log("error "+error);
+// ====================== SIGNIN (Customer login) ======================
+export const signin = createAsyncThunk(
+  "auth/signin",       // ❌ fixed action name
+  async (loginRequest, { rejectWithValue }) => {
+    try {
+      const response = await api.post("/api/auth/signin", loginRequest); // ❌ fixed missing slash
+      console.log("Login otp", response.data);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Signin failed"
+      );
     }
   }
-)
+);
 
-
-export const logout = createAsyncThunk<any,any>("/auth/logout",
-  async(navigate, {rejectWithValue})=>{
-    try{
-      localStorage.clear()
-      console.log("logout success")
-      navigate("/")
-    }catch(error){
-      console.log("Error "+ error);
-    }
+// ====================== LOGOUT ======================
+export const logout = createAsyncThunk<void, (path: string) => void>(
+  "auth/logout",
+  async (navigate) => {
+    localStorage.clear();
+    console.log("logout success");
+    navigate("/"); 
   }
-)
+);
 
+
+// ====================== INITIAL STATE ======================
 interface AuthState {
   message: string | null;
   loading: boolean;
@@ -76,20 +82,17 @@ interface AuthState {
   } | null;
 }
 
-
 const initialState: AuthState = {
   message: null,
   loading: false,
   error: null,
   token: localStorage.getItem("token") || null,
-
-  // 🚀 ADD THIS
   user: localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user")!)
     : null,
 };
 
-
+// ====================== SLICE ======================
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -99,12 +102,14 @@ const authSlice = createSlice({
     },
     logoutSeller(state) {
       state.token = null;
-      localStorage.removeItem("token");          
+      localStorage.removeItem("token");
       localStorage.removeItem("role");
     },
   },
+
   extraReducers: (builder) => {
     builder
+      // ===== OTP =====
       .addCase(sendLoginSignupOtp.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -118,6 +123,7 @@ const authSlice = createSlice({
         state.error = action.payload as string;
       })
 
+      // ===== SELLER LOGIN =====
       .addCase(loginSeller.pending, (state) => {
         state.loading = true;
       })
@@ -126,22 +132,26 @@ const authSlice = createSlice({
         state.message = "Login successful";
         state.error = null;
 
-        const token = action.payload?.jwt; 
+        const token = action.payload?.jwt;
 
         if (token) {
           state.token = token;
-          localStorage.setItem("token", token);    
+          localStorage.setItem("token", token);
           localStorage.setItem("role", "ROLE_SELLER");
         }
       })
       .addCase(loginSeller.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+
+      // ===== SIGNIN =====
+      .addCase(signin.fulfilled, (state, action) => {
+        // optional: handle storing user/customer data here
       });
   },
 });
 
+// ======================
 export const { clearSellerError, logoutSeller } = authSlice.actions;
-
 export default authSlice.reducer;
-

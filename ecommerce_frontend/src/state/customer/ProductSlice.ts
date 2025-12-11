@@ -1,65 +1,54 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api } from "../../config/api";
+import api from "../../config/api"
 import { Product } from "../../type/productType";
 
-const API_URL = "/products";
+const API_URL = "/api/products";
 
-export const fetchProductById=createAsyncThunk<any,any>("products/fetchProductById",
-    async(ProductId, { rejectWithValue })=>{
-        try{
-            const response = await api.get(`${API_URL}/${ProductId}`)
-            
-            const data = response.data;
-            console.log("Data :" , response.data)
-            return data
-        } catch(error:any){
-            console.log("error: "+ error)
-            rejectWithValue(error.message)
-        }
+export const fetchProductById = createAsyncThunk<any, any>(
+  "products/fetchProductById",
+  async (productId, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`${API_URL}/${productId}`);
+
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || error.message);
     }
-)
+  }
+);
 
 
-export const searchProduct=createAsyncThunk("products/searchProduct",
-    async(query, { rejectWithValue })=>{
-        try{
-            const response = await api.get(`${API_URL}/search`,{
-                params: {
-                    query,
-                }
-            })
-            
-            const data = response.data;
-            console.log("Search Product Data :" , data)
-            return data
-        } catch(error:any){
-            console.log("error: "+ error)
-            rejectWithValue(error.message)
-        }
+export const searchProduct = createAsyncThunk(
+  "products/searchProduct",
+  async (query, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`${API_URL}/search`, {
+        params: { query },
+      });
+
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || error.message);
     }
-)
+  }
+);
 
 
-export const fetchAllProducts=createAsyncThunk<any,any>("products/fetchAllProducts",
-    async(params, { rejectWithValue })=>{
 
-        try{
-            const response = await api.get(`${API_URL}`,{
-                params: {
-                    ...params,
-                    pageNumber:params.pageNumber || 0
-                }
-            })
-            
-            const data = response.data;
-            console.log("All Product Data :" , data)
-            return data
-        } catch(error:any){
-            console.log("error: "+ error)
-            rejectWithValue(error.message)
-        }
+export const fetchAllProducts = createAsyncThunk<any, any>(
+  "products/fetchAllProducts",
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`${API_URL}`, {
+        params: { ...params, pageNumber: params.pageNumber || 0 },
+      });
+
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || error.message);
     }
-)
+  }
+);
 
 interface ProductState{
     product : Product | null;

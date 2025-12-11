@@ -1,24 +1,26 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api } from "../../config/api";
+import api from "../../config/api";
 
 export const fetchSellerProfile = createAsyncThunk(
   "seller/fetchSellerProfile",
   async (jwt: string, { rejectWithValue }) => {
     try {
-      const response = await api.get("/seller/profile", {
+      const response = await api.get("/api/seller/profile", {
         headers: {
           Authorization: `Bearer ${jwt}`,
         },
       });
-      console.log("fetch seller profile : ", response.data)
+
+      console.log("fetch seller profile : ", response.data);
       return response.data;
+
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || "Failed to fetch profile");
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch profile"
+      );
     }
   }
 );
-
-
 
 export const updateSellerProfile = createAsyncThunk(
   "seller/updateSellerProfile",
@@ -26,19 +28,21 @@ export const updateSellerProfile = createAsyncThunk(
     try {
       const jwt = localStorage.getItem("token");
 
-      const response = await api.patch("/seller/profile/update", updateData, {
+      const response = await api.patch("/api/seller/profile/update", updateData, {
         headers: {
           Authorization: `Bearer ${jwt}`,
         },
       });
 
       return response.data;
+
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || "Failed to update profile");
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update profile"
+      );
     }
   }
 );
-
 
 interface SellerState {
   seller: any;
@@ -70,8 +74,8 @@ const sellerProfileSlice = createSlice({
         state.error = action.payload as string;
       })
       .addCase(updateSellerProfile.fulfilled, (state, action) => {
-          state.seller = action.payload;
-      });  
+        state.seller = action.payload;
+      });
   },
 });
 

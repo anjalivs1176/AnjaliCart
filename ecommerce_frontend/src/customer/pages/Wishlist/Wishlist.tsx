@@ -1,6 +1,6 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from "../../../config/api"
 
 const Wishlist = () => {
   const [wishlist, setWishlist] = useState<any>(null);
@@ -9,18 +9,8 @@ const Wishlist = () => {
 
   const fetchWishlist = async () => {
     try {
-      const token = localStorage.getItem("token") || "";
-
-      const res = await fetch("${process.env.REACT_APP_API_URL}/api/wishlist", {
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        }
-      });
-
-      const data = await res.json();
-      setWishlist(data);
-
+      const res = await api.get("/api/wishlist");
+      setWishlist(res.data);
     } catch (err) {
       console.log("wishlist fetch error:", err);
     }
@@ -32,49 +22,30 @@ const Wishlist = () => {
 
 
   const handleRemove = async (productId: number, e: any) => {
-    e.stopPropagation(); 
+    e.stopPropagation();
 
     try {
-      const token = localStorage.getItem("token") || "";
+      const res = await api.post(`/api/wishlist/add-product/${productId}`);
+      console.log("Removed:", res.data);
 
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/wishlist/add-product/${productId}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        }
-      });
-
-      const data = await res.json();
-      console.log("Removed:", data);
-
-      fetchWishlist(); 
-
+      fetchWishlist();
     } catch (err) {
       console.log("Remove wishlist error:", err);
     }
   };
 
- 
-  const handleMoveToCart = async (product: any, e: any) => {
-    e.stopPropagation(); 
-    try {
-      const token = localStorage.getItem("token") || "";
 
+  const handleMoveToCart = async (product: any, e: any) => {
+    e.stopPropagation();
+
+    try {
       const body = {
         productId: product.id,
         size: product.sizes || "DEFAULT",
-        quantity: 1
+        quantity: 1,
       };
 
-      await fetch("${process.env.REACT_APP_API_URL}/api/cart/add", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(body)
-      });
+      await api.put("/api/cart/add", body);
 
       console.log("Moved to cart");
 
@@ -93,7 +64,6 @@ const Wishlist = () => {
 
         {wishlist?.products?.length > 0 ? (
           wishlist.products.map((product: any) => {
-
             const url = `/product-details/${product.category?.categoryId}/${product.title}/${product.id}`;
 
             return (
@@ -108,7 +78,6 @@ const Wishlist = () => {
                   className='w-full h-[220px] object-cover rounded-md'
                 />
 
-                
                 <h2 className='font-semibold mt-3 text-lg'>
                   {product.title}
                 </h2>
@@ -117,7 +86,6 @@ const Wishlist = () => {
                   ₹{product.sellingPrice}
                 </p>
 
-               
                 <div className='flex justify-between mt-4'>
                   <button
                     onClick={(e) => handleRemove(product.id, e)}
@@ -133,6 +101,7 @@ const Wishlist = () => {
                     Move to Cart
                   </button>
                 </div>
+
               </div>
             );
           })

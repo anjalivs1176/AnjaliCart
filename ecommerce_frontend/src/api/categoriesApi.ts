@@ -1,7 +1,7 @@
-import axios from "axios";
+import api from "../config/api"
 
 export const categoriesApi = {
   getCategories() {
-    return axios.get(`${process.env.REACT_APP_API_URL}/api/categories`);
+    return api.get("/api/categories");
   },
 };

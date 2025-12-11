@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Button } from '@mui/material';
-
+import api from "../../../config/api";
 const RegisterForm = () => {
   const [name, setName] = useState("");
   const [mobile, setMobile] = useState("");
@@ -15,7 +15,7 @@ const RegisterForm = () => {
     setErrorMsg("");
 
     try {
-      await axios.post("${process.env.REACT_APP_API_URL}/api/auth/send/login-signup-otp", {
+      await api.post("/api/auth/send/login-signup-otp", {
         email,
         role: "ROLE_CUSTOMER"
       });
@@ -31,7 +31,7 @@ const RegisterForm = () => {
     setErrorMsg("");
 
     try {
-      const res = await axios.post("${process.env.REACT_APP_API_URL}/api/auth/signup", {
+      const res = await api.post("/api/auth/signup", {
         name,
         email,
         mobile,
