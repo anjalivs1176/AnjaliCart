@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/seller")
+@RequestMapping("/api/seller")
 @Slf4j
 public class SellerController {
 
@@ -70,9 +70,8 @@ public class SellerController {
         // URL encode email
         String encodedEmail = URLEncoder.encode(savedSeller.getEmail(), StandardCharsets.UTF_8);
 
-        String verifyUrl = "https://anjalicart.netlify.app/verify-seller/" 
-                    + encodedEmail + "/" + otp;
-
+        String verifyUrl = "https://anjalicart.netlify.app/verify-seller/"
+                + encodedEmail + "/" + otp;
 
         String subject = "AnjaliCart Seller Email Verification";
         String text = "Welcome to AnjaliCart! Your OTP: " + otp + "\n\nVerify here:\n" + verifyUrl;

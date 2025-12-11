@@ -1,23 +1,32 @@
 package com.Anjali.ECommerce.Controller;
 
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.Anjali.ECommerce.Model.Product;
 import com.Anjali.ECommerce.Model.Seller;
 import com.Anjali.ECommerce.Request.CreateProductRequest;
-import com.Anjali.ECommerce.Request.UpdateProductRequest;
 import com.Anjali.ECommerce.Service.ProductService;
 import com.Anjali.ECommerce.Service.SellerService;
 import com.Anjali.ECommerce.exception.ProductException;
 import com.Anjali.ECommerce.exception.SellerException;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import java.util.Map;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/sellers/products")
+@RequestMapping("/api/sellers/products")
 public class SellerProductController {
 
     private final ProductService productService;
@@ -47,72 +56,58 @@ public class SellerProductController {
     // Delete a product (only if it belongs to the logged-in seller)
     @DeleteMapping("/{productId}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long productId,
-                                              @RequestHeader("Authorization") String jwt) throws Exception {
+            @RequestHeader("Authorization") String jwt) throws Exception {
         try {
             Seller seller = sellerService.getSellerProfile(jwt); // Get logged-in seller
 
             Product product = productService.findProductById(productId); // Fetch the product
-            if(!product.getSeller().getId().equals(seller.getId())) { // Check if seller owns the product
+            if (!product.getSeller().getId().equals(seller.getId())) { // Check if seller owns the product
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN); // Return 403 if not owner
             }
 
             productService.deleteProduct(productId); // Proceed to delete if ownership matches
             return new ResponseEntity<>(HttpStatus.OK); // Return OK after deletion
 
-        } catch(ProductException e) {
+        } catch (ProductException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Return 404 if product not found
         }
     }
 
+    @GetMapping("/{productId}")
+    public ResponseEntity<Product> getProductForEdit(
+            @PathVariable Long productId,
+            @RequestHeader("Authorization") String jwt
+    ) throws Exception {
 
+        Seller seller = sellerService.getSellerProfile(jwt);
+        Product product = productService.findProductById(productId);
 
+        if (!product.getSeller().getId().equals(seller.getId())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
 
-
-
-@GetMapping("/{productId}")
-public ResponseEntity<Product> getProductForEdit(
-        @PathVariable Long productId,
-        @RequestHeader("Authorization") String jwt
-) throws Exception {
-
-    Seller seller = sellerService.getSellerProfile(jwt);
-    Product product = productService.findProductById(productId);
-
-    if (!product.getSeller().getId().equals(seller.getId())) {
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        return ResponseEntity.ok(product);
     }
 
-    return ResponseEntity.ok(product);
-}
+    @PutMapping("/{productId}")
+    public ResponseEntity<Product> updateProduct(
+            @PathVariable Long productId,
+            @RequestBody Product product,
+            @RequestHeader("Authorization") String jwt
+    ) throws Exception {
 
+        Seller seller = sellerService.getSellerProfile(jwt);
+        Product existing = productService.findProductById(productId);
 
+        if (!existing.getSeller().getId().equals(seller.getId())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
 
+        product.setId(productId);
+        product.setSeller(existing.getSeller());
 
-
-@PutMapping("/{productId}")
-public ResponseEntity<Product> updateProduct(
-        @PathVariable Long productId,
-        @RequestBody Product product,
-        @RequestHeader("Authorization") String jwt
-) throws Exception {
-
-    Seller seller = sellerService.getSellerProfile(jwt);
-    Product existing = productService.findProductById(productId);
-
-    if (!existing.getSeller().getId().equals(seller.getId())) {
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        Product updated = productService.updateProduct(productId, product);
+        return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 
-    product.setId(productId);
-    product.setSeller(existing.getSeller()); 
-
-    Product updated = productService.updateProduct(productId, product);
-    return new ResponseEntity<>(updated, HttpStatus.OK);
-}
-
-
-
-
-
-    
 }

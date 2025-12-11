@@ -18,9 +18,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
+
     private final UserRepository userRepository;
     private final AuthService authService;
 
@@ -43,14 +44,13 @@ public class AuthController {
     @PostMapping("/send/login-signup-otp")
     public ResponseEntity<ApiResponse> sendOtpHandler(@RequestBody LoginOtpRequest req) throws Exception {
 
-        String jwt = authService.sendLoginAndSignupOtp(req.getEmail(),req.getRole());
+        String jwt = authService.sendLoginAndSignupOtp(req.getEmail(), req.getRole());
 
         ApiResponse res = new ApiResponse();
         res.setMessage("OTP sent successfully");
 
         return ResponseEntity.ok(res);
     }
-
 
     @PostMapping("/signing")
     public ResponseEntity<AuthResponse> loginHandler(@RequestBody LoginRequest req) throws Exception {
