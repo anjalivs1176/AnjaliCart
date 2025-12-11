@@ -9,56 +9,63 @@ const LoginForm = () => {
   const [otp, setOtp] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
-  const handleSendOtp = async () => {
-    setErrorMsg("");
 
-    try {
-      await axios.post("${process.env.REACT_APP_API_URL}/auth/send/login-signup-otp", {
-        email: "signin_" + email,
-        role: "ROLE_CUSTOMER"
-      });
+const handleSendOtp = async () => {
+  setErrorMsg("");
 
-      setOtpSent(true);
+  const isAdmin = email === "anjalivs.dev@gmail.com";
 
-    } catch (error: any) {
-      const msg = error.response?.data?.message || "Something went wrong";
-      setErrorMsg(msg);
-    }
-  };
-  const handleLogin = async () => {
-    try {
-      const res = await axios.post("${process.env.REACT_APP_API_URL}/auth/signing", {
-        email,
-        otp,
-        role: "ROLE_CUSTOMER"
-      });
+  try {
+    await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/send/login-signup-otp`, {
+      email: isAdmin ? email : "signin_" + email,
+      role: isAdmin ? "ROLE_ADMIN" : "ROLE_CUSTOMER"
+    });
 
-      const { jwt, role, id, name, profileImage } = res.data;
+    setOtpSent(true);
 
-      localStorage.setItem("token", jwt);
-      localStorage.setItem("role", role);
+  } catch (error: any) {
+    const msg = error.response?.data?.message || "Something went wrong";
+    setErrorMsg(msg);
+  }
+};
 
 
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          id: id,
-          name: name,
-          profileImage: profileImage || null
-        })
-      );
+const handleLogin = async () => {
+  const isAdmin = email === "anjalivs.dev@gmail.com";
 
-      window.dispatchEvent(new Event("authChange"));
+  try {
+    const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/signing`, {
+      email: isAdmin ? email : "signin_" + email,
+      otp,
+      role: isAdmin ? "ROLE_ADMIN" : "ROLE_CUSTOMER"
+    });
 
-      if (role === "ROLE_ADMIN") navigate("/admin");
-      else if (role === "ROLE_SELLER") navigate("/seller");
-      else navigate("/");
+    const { jwt, role, id, name, profileImage } = res.data;
 
-    } catch (error: any) {
-      const msg = error.response?.data?.message || "Invalid OTP!";
-      setErrorMsg(msg);
-    }
-  };
+    localStorage.setItem("token", jwt);
+    localStorage.setItem("role", role);
+
+    localStorage.setItem(
+      "user",
+      JSON.stringify({
+        id,
+        name,
+        profileImage: profileImage || null,
+      })
+    );
+
+    window.dispatchEvent(new Event("authChange"));
+
+    if (role === "ROLE_ADMIN") navigate("/admin");
+    else if (role === "ROLE_SELLER") navigate("/seller");
+    else navigate("/");
+
+  } catch (error: any) {
+    const msg = error.response?.data?.message || "Invalid OTP!";
+    setErrorMsg(msg);
+  }
+};
+
 
 
 

@@ -31,7 +31,7 @@ const SellerVerifyOTP: React.FC = () => {
       const encodedEmail = encodeURIComponent(email);
       const encodedOtp = encodeURIComponent(otp);
 
-      const url = `${process.env.REACT_APP_API_URL}/seller/verify/${encodedEmail}/${encodedOtp}`;
+      const url = `${process.env.REACT_APP_API_URL}/api/seller/verify/${encodedEmail}/${encodedOtp}`;
 
       const res = await fetch(url, {
         method: "PATCH",

@@ -24,31 +24,29 @@ import jakarta.servlet.http.HttpServletRequest;
 public class AppConfig {
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource)
+            throws Exception {
 
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
-                .sessionManagement(session
-                        -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                // PUBLIC ROUTES (VERY IMPORTANT)
                 .requestMatchers("/api/public/**").permitAll()
-                // Public GET endpoints
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/seller/**").permitAll()
+                // Public GET API
                 .requestMatchers(HttpMethod.GET, "/api/home/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/deals/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/home-categories/**").permitAll()
-                // PUBLIC AUTH ENDPOINTS
-                .requestMatchers("/api/auth/**").permitAll() // customer login/register
-                .requestMatchers("/api/seller/**").permitAll() // seller login/register
-
-                // ALLOW ADMIN LOGIN PUBLICLY (VERY IMPORTANT)
+                // Admin login is public
                 .requestMatchers("/api/admin/login").permitAll()
-                // All other admin routes — authenticated
+                // All other admin routes need auth
                 .requestMatchers("/api/admin/**").authenticated()
-                // All other API routes — authenticated
+                // Any other /api requires JWT
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
                 )
@@ -57,7 +55,6 @@ public class AppConfig {
         return http.build();
     }
 
-    // CORS FIXED FOR NETLIFY + LOCALHOST
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         return new CorsConfigurationSource() {
