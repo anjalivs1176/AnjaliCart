@@ -1,34 +1,56 @@
 package com.Anjali.ECommerce.Service;
 
-import org.springframework.mail.MailException;
-import org.springframework.mail.MailSendException;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import lombok.RequiredArgsConstructor;
-
 @Service
-@RequiredArgsConstructor
 public class EmailService {
 
-    private final JavaMailSender javaMailSender;
+    @Value("${resend.api.key}")
+    private String resendApiKey;
 
-    public void sendVerificationOtpEmail(String userEmail, String otp, String subject, String text) throws MessagingException {
+    @Value("${mail.from}")
+    private String from;
+
+    public void sendVerificationOtpEmail(String userEmail, String otp, String subject, String text) {
+
         try {
-            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            String url = "https://api.resend.com/emails";
 
-            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, "UTF-8");
+            String jsonBody = """
+                {
+                  "from": "%s",
+                  "to": ["%s"],
+                  "subject": "%s",
+                  "html": "<p>%s</p><p>Your OTP is <b>%s</b></p>"
+                }
+            """.formatted(from, userEmail, subject, text, otp);
 
-            mimeMessageHelper.setSubject(subject);
-            mimeMessageHelper.setText(text);
-            mimeMessageHelper.setTo(userEmail);
+            HttpClient client = HttpClient.newHttpClient();
 
-            javaMailSender.send(mimeMessage);
-        } catch (MailException e) {
-            throw new MailSendException("Failed to send Email");
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .header("Authorization", "Bearer " + resendApiKey)
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                    .build();
+
+            HttpResponse<String> response
+                    = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            System.out.println("📧 RESEND RESPONSE = " + response.body());
+
+            if (response.statusCode() >= 400) {
+                throw new RuntimeException("Failed to send email via Resend");
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to send Email", e);
         }
     }
 }
