@@ -12,7 +12,7 @@ const Orders = () => {
       try {
         const token = localStorage.getItem("token");
 
-        const res = await axios.get("${process.env.REACT_APP_API_URL}/api/orders/user", {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/orders/user`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

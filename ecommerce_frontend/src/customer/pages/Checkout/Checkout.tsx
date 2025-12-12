@@ -48,7 +48,7 @@ const Checkout = () => {
     try {
       const token = localStorage.getItem("token") || "";
 
-      const res = await fetch("${process.env.REACT_APP_API_URL}/api/address", {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/address`, {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
@@ -72,7 +72,7 @@ const Checkout = () => {
   const fetchCart = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("${process.env.REACT_APP_API_URL}/api/cart", {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/cart`, {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,

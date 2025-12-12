@@ -14,7 +14,7 @@ const UserDetails = () => {
       try {
         const token = localStorage.getItem("token");
 
-        const res = await axios.get("${process.env.REACT_APP_API_URL}/api/users/profile", {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/users/profile`, {
           headers: {
             Authorization: `Bearer ${token}`
           }

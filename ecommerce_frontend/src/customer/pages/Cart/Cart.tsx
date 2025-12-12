@@ -23,7 +23,7 @@ const Cart = () => {
         try {
             const token = localStorage.getItem("token") || "";
 
-            const res = await fetch("${process.env.REACT_APP_API_URL}/api/cart", {
+            const res = await fetch(`${process.env.REACT_APP_API_URL}/api/cart`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -43,7 +43,7 @@ const Cart = () => {
         try {
             const token = localStorage.getItem("token") || "";
 
-            const res = await fetch("${process.env.REACT_APP_API_URL}/api/coupons/active", {
+            const res = await fetch(`${process.env.REACT_APP_API_URL}/api/coupons/active`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
