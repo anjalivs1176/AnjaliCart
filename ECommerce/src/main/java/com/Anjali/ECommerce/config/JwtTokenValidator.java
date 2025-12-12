@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -28,13 +29,12 @@ public class JwtTokenValidator extends OncePerRequestFilter {
 
         String path = request.getServletPath();
 
-        // 🚀 ALLOW AUTH ROUTES (login, register, OTP, seller signup)
+        // Allow auth endpoints
         if (path.startsWith("/api/auth/")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Extract JWT from header
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
@@ -49,10 +49,14 @@ public class JwtTokenValidator extends OncePerRequestFilter {
                     .parseClaimsJws(token)
                     .getBody();
 
-            String username = claims.getSubject();
+            String email = claims.get("email", String.class);
+            String role = claims.get("authorities", String.class); // ⭐ role here
+
+            List<SimpleGrantedAuthority> authorities
+                    = List.of(new SimpleGrantedAuthority(role));
 
             UsernamePasswordAuthenticationToken authentication
-                    = new UsernamePasswordAuthenticationToken(username, null, List.of());
+                    = new UsernamePasswordAuthenticationToken(email, null, authorities);
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
