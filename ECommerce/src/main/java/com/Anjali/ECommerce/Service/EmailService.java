@@ -1,37 +1,38 @@
 package com.Anjali.ECommerce.Service;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import lombok.RequiredArgsConstructor;
+
+import jakarta.mail.internet.MimeMessage;
 
 @Service
-@RequiredArgsConstructor
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    private final JavaMailSender javaMailSender;
 
     @Value("${mail.from}")
-    private String fromEmail;
+    private String from;
 
-    public void sendVerificationOtpEmail(String toEmail, String otp, String subject, String text) {
+    public EmailService(JavaMailSender javaMailSender) {
+        this.javaMailSender = javaMailSender;
+    }
 
+    public void sendVerificationOtpEmail(String userEmail, String otp, String subject, String text) {
         try {
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom(fromEmail);
-            message.setTo(toEmail);
-            message.setSubject(subject);
-            message.setText(text + "\nYour OTP is: " + otp);
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-            mailSender.send(message);
+            helper.setFrom(from);
+            helper.setTo(userEmail);
+            helper.setSubject(subject);
+            helper.setText(text + "\n\nYour OTP: " + otp);
 
-            System.out.println("📧 Gmail SMTP Email Sent Successfully to " + toEmail);
+            javaMailSender.send(message);
 
-        } catch (MailException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to send Email");
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to send OTP email", e);
         }
     }
 }
