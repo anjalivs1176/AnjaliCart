@@ -197,13 +197,16 @@ public class AuthServiceImpl implements AuthService {
         UserDetails userDetails = null;
         String roleName = null;
 
-        // 1) Try loading CUSTOMER
-        try {
-            userDetails = customUserService.loadUserByUsername(username);
-            if (userDetails != null) {
-                roleName = "ROLE_CUSTOMER";
-            }
-        } catch (Exception ignored) {
+        // 1) Load CUSTOMER from User table (DO NOT use UserDetailsService)
+        User user = userRepository.findByEmail(username);
+
+        if (user != null) {
+            roleName = user.getRole().toString();   // This gives ROLE_CUSTOMER
+            userDetails = org.springframework.security.core.userdetails.User
+                    .withUsername(username)
+                    .password("")
+                    .authorities(new SimpleGrantedAuthority(roleName))
+                    .build();
         }
 
         // 2) Try loading SELLER
