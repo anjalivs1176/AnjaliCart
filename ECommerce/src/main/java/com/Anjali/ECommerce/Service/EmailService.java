@@ -22,16 +22,19 @@ public class EmailService {
     public void sendVerificationOtpEmail(String userEmail, String otp, String subject, String text) {
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
 
             helper.setFrom(from);
             helper.setTo(userEmail);
             helper.setSubject(subject);
-            helper.setText(text + "\n\nYour OTP: " + otp);
+            helper.setText(text + "\n\nYour OTP: " + otp, false);
 
             javaMailSender.send(message);
 
+            System.out.println("Email sent to " + userEmail);
+
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("Failed to send OTP email", e);
         }
     }
