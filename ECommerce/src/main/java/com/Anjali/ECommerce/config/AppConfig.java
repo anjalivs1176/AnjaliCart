@@ -61,7 +61,7 @@ public class AppConfig {
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                 CorsConfiguration cfg = new CorsConfiguration();
 
-                cfg.setAllowedOriginPatterns(List.of(
+                cfg.setAllowedOrigins(List.of(
                         "http://localhost:3000",
                         "https://anjalicart.netlify.app",
                         "https://anjalicart.onrender.com"
