@@ -29,49 +29,41 @@ public class JwtTokenValidator extends OncePerRequestFilter {
             FilterChain filterChain)
             throws ServletException, IOException {
 
-        String path = request.getRequestURI();
+        String path = request.getServletPath();
 
-        // ⭐ SKIP JWT CHECK FOR PUBLIC ROUTES
-        if (path.startsWith("/api/auth")
-                || path.startsWith("/api/seller/login")
-                || path.startsWith("/api/seller/verify")) {
-
+        // 🚀 ALLOW ALL AUTH ROUTES WITHOUT CHECKING TOKEN
+        if (path.startsWith("/api/auth/")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String jwt = request.getHeader("Authorization");
-        jwt = request.getHeader("Authorization");
+        // Extract token
+        String jwt = extractToken(request);
 
-        if (jwt != null && jwt.startsWith("Bearer ")) {
+        if (jwt == null || jwt.trim().isEmpty()) {
+            // no token → let it go ONLY if the route is public
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-            jwt = jwt.substring(7);
+        try {
+            // validate your JWT normally
+            Claims claims = Jwts.parser()
+                    .setSigningKey(SECRET.getBytes())
+                    .parseClaimsJws(jwt)
+                    .getBody();
 
-            try {
-                SecretKey key = Keys.hmacShaKeyFor(
-                        JWT_CONSTANT.SECRET_KEY.getBytes()
-                );
+            // set authentication
+            UsernamePasswordAuthenticationToken auth
+                    = new UsernamePasswordAuthenticationToken(
+                            claims.getSubject(), null, List.of()
+                    );
 
-                Claims claims = Jwts.parserBuilder()
-                        .setSigningKey(key)
-                        .build()
-                        .parseClaimsJws(jwt)
-                        .getBody();
+            SecurityContextHolder.getContext().setAuthentication(auth);
 
-                String email = claims.get("email", String.class);
-                String authorities = claims.get("authorities", String.class);
-
-                List<GrantedAuthority> auths
-                        = AuthorityUtils.commaSeparatedStringToAuthorityList(authorities);
-
-                Authentication authentication
-                        = new UsernamePasswordAuthenticationToken(email, null, auths);
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            } catch (Exception e) {
-                throw new BadCredentialsException("Invalid JWT Token");
-            }
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return;
         }
 
         filterChain.doFilter(request, response);
