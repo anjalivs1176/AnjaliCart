@@ -23,44 +23,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class JwtTokenValidator extends OncePerRequestFilter {
 
-    // @Override
-    // protected void doFilterInternal(HttpServletRequest request,
-    //                                 HttpServletResponse response,
-    //                                 FilterChain filterChain)
-    //         throws ServletException, IOException {
-    //     // ⭐ SKIP JWT CHECK FOR PUBLIC AUTH ROUTES ⭐
-    //     String path = request.getRequestURI();
-    //     if (path.startsWith("/auth")) {
-    //         filterChain.doFilter(request, response);
-    //         return;
-    //     }
-    //     // Get Authorization header
-    //     String jwt = request.getHeader("Authorization");
-    //     if (jwt != null && jwt.startsWith("Bearer ")) {
-    //         jwt = jwt.substring(7);
-    //         try {
-    //             // Parse & validate JWT
-    //             SecretKey key = Keys.hmacShaKeyFor(JWT_CONSTANT.SECRET_KEY.getBytes());
-    //             Claims claims = Jwts.parserBuilder()
-    //                     .setSigningKey(key)
-    //                     .build()
-    //                     .parseClaimsJws(jwt)
-    //                     .getBody();
-    //             // Extract email & roles
-    //             String email = String.valueOf(claims.get("email"));
-    //             String authorities = String.valueOf(claims.get("authorities"));
-    //             List<GrantedAuthority> auths =
-    //                     AuthorityUtils.commaSeparatedStringToAuthorityList(authorities);
-    //             // Create authentication token
-    //             Authentication authentication =
-    //                     new UsernamePasswordAuthenticationToken(email, null, auths);
-    //             SecurityContextHolder.getContext().setAuthentication(authentication);
-    //         } catch (Exception e) {
-    //             throw new BadCredentialsException("Invalid JWT Token");
-    //         }
-    //     }
-    //     filterChain.doFilter(request, response);
-    // }
     @Override
     protected void doFilterInternal(HttpServletRequest request,
             HttpServletResponse response,

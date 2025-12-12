@@ -21,7 +21,7 @@ const LoginForm = () => {
 
     try {
       await api.post("/api/auth/send/login-signup-otp", {
-        email: email,                         // FIXED
+        email: email,                         
         role: isAdmin ? "ROLE_ADMIN" : "ROLE_CUSTOMER"
       });
 

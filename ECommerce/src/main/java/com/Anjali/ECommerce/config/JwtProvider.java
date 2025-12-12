@@ -1,25 +1,25 @@
 package com.Anjali.ECommerce.config;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.stereotype.Service;
-
-import javax.crypto.SecretKey;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.crypto.SecretKey;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.stereotype.Service;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+
 /**
  * ✅ JwtProvider
  *
- * This class handles:
- *  - Generating JWT tokens after successful authentication
- *  - Extracting user info (like email) from JWT tokens
+ * This class handles: - Generating JWT tokens after successful authentication -
+ * Extracting user info (like email) from JWT tokens
  *
  * Basically, it’s your mini JWT factory + validator for login sessions.
  */
@@ -33,7 +33,8 @@ public class JwtProvider {
     /**
      * 🧾 Generates a JWT token for the authenticated user.
      *
-     * @param auth -> Spring Security's Authentication object (contains username + roles)
+     * @param auth -> Spring Security's Authentication object (contains username
+     * + roles)
      * @return compact JWT token string
      */
     public String generateToken(Authentication auth) {
@@ -78,8 +79,9 @@ public class JwtProvider {
     }
 
     /**
-     * 🧩 Converts a list of GrantedAuthority objects (roles) into a single comma-separated string.
-     * Example: [ROLE_USER, ROLE_ADMIN] -> "ROLE_USER,ROLE_ADMIN"
+     * 🧩 Converts a list of Grantedsority objects (roles) into a single
+     * comma-separated string. Example: [ROLE_USER, ROLE_ADMIN] ->
+     * "ROLE_USER,ROLE_ADMIN"
      *
      * @param authorities -> user's roles from Spring Security
      * @return comma-separated roles as string

@@ -7,6 +7,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -193,23 +194,27 @@ public class AuthServiceImpl implements AuthService {
 
     private Authentication authenticate(String username, String otp) {
 
-        // 1) Attempt to load UserDetails via existing custom service
         UserDetails userDetails = null;
+        String roleName = null;
+
+        // 1) Try loading CUSTOMER
         try {
             userDetails = customUserService.loadUserByUsername(username);
+            if (userDetails != null) {
+                roleName = "ROLE_CUSTOMER";
+            }
         } catch (Exception ignored) {
         }
 
-        // 2) If customUserService didn't find a user, try to build details for seller
+        // 2) Try loading SELLER
         if (userDetails == null) {
             Seller seller = sellerRepository.findByEmail(username);
             if (seller != null) {
+                roleName = seller.getRole().toString();
                 userDetails = org.springframework.security.core.userdetails.User
                         .withUsername(username)
-                        .password("") // not used in OTP flow
-                        .authorities(new SimpleGrantedAuthority(seller.getRole().toString()))
-                        .accountLocked(false)
-                        .disabled(false)
+                        .password("")
+                        .authorities(new SimpleGrantedAuthority(roleName))
                         .build();
             }
         }
@@ -218,7 +223,7 @@ public class AuthServiceImpl implements AuthService {
             throw new BadCredentialsException("Invalid username");
         }
 
-        // Retrieve verification codes (pick latest)
+        // OTP check
         List<VerificationCode> codes = verificationCodeRepository.findByEmail(username);
         VerificationCode vc = (codes == null || codes.isEmpty()) ? null : codes.get(codes.size() - 1);
 
@@ -226,13 +231,17 @@ public class AuthServiceImpl implements AuthService {
             throw new BadCredentialsException("Invalid OTP");
         }
 
-        // Delete used OTP(s)
         verificationCodeRepository.deleteByEmail(username);
 
+        // 3) ALWAYS GIVE ROLE HERE
+        List<GrantedAuthority> authorities
+                = AuthorityUtils.createAuthorityList(roleName);
+
         return new UsernamePasswordAuthenticationToken(
-                userDetails,
+                username,
                 null,
-                userDetails.getAuthorities()
+                authorities
         );
     }
+
 }
