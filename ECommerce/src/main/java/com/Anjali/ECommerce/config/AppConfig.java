@@ -1,6 +1,5 @@
 package com.Anjali.ECommerce.config;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
@@ -16,26 +15,25 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
-
-import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
 public class AppConfig {
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource)
-            throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                .cors(cors -> {
+                })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                // PUBLIC ROUTES MUST COME FIRST
+                // Public Routes
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/public/**").permitAll()
-                // Public GET APIs
+                // Public GET routes for customer browsing
                 .requestMatchers(HttpMethod.GET, "/api/home/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/deals/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
@@ -43,9 +41,9 @@ public class AppConfig {
                 .requestMatchers(HttpMethod.GET, "/api/home-categories/**").permitAll()
                 // Admin login public
                 .requestMatchers("/api/admin/login").permitAll()
-                // SECURED ROUTES
-                .requestMatchers("/api/admin/**").authenticated()
-                .requestMatchers("/api/seller/**").authenticated() // FIXED: seller now requires login
+                // Protected routes
+                .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
+                .requestMatchers("/api/seller/**").hasAuthority("ROLE_SELLER")
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
                 )
@@ -56,26 +54,23 @@ public class AppConfig {
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
-        return new CorsConfigurationSource() {
-            @Override
-            public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-                CorsConfiguration cfg = new CorsConfiguration();
+        CorsConfiguration cfg = new CorsConfiguration();
 
-                cfg.setAllowedOrigins(List.of(
-                        "http://localhost:3000",
-                        "https://anjalicart.netlify.app",
-                        "https://anjalicart.onrender.com"
-                ));
+        cfg.setAllowedOrigins(List.of(
+                "http://localhost:3000",
+                "https://anjalicart.netlify.app",
+                "https://anjalicart.onrender.com"
+        ));
 
-                cfg.setAllowedMethods(Collections.singletonList("*"));
-                cfg.setAllowedHeaders(Collections.singletonList("*"));
-                cfg.setAllowCredentials(true);
-                cfg.setExposedHeaders(Collections.singletonList("Authorization"));
-                cfg.setMaxAge(3600L);
+        cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH"));
+        cfg.setAllowedHeaders(List.of("*"));
+        cfg.setAllowCredentials(true);
+        cfg.setExposedHeaders(List.of("Authorization"));
+        cfg.setMaxAge(3600L);
 
-                return cfg;
-            }
-        };
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", cfg);
+        return source;
     }
 
     @Bean
