@@ -32,21 +32,20 @@ public class AppConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                // PUBLIC ROUTES (VERY IMPORTANT)
-                .requestMatchers("/api/public/**").permitAll()
+                // PUBLIC ROUTES MUST COME FIRST
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/seller/**").permitAll()
-                // Public GET API
+                .requestMatchers("/api/public/**").permitAll()
+                // Public GET APIs
                 .requestMatchers(HttpMethod.GET, "/api/home/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/deals/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/home-categories/**").permitAll()
-                // Admin login is public
+                // Admin login public
                 .requestMatchers("/api/admin/login").permitAll()
-                // All other admin routes need auth
+                // SECURED ROUTES
                 .requestMatchers("/api/admin/**").authenticated()
-                // Any other /api requires JWT
+                .requestMatchers("/api/seller/**").authenticated() // FIXED: seller now requires login
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
                 )
