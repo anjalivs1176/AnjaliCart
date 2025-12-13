@@ -5,7 +5,6 @@ import {
   IconButton,
   useMediaQuery,
   useTheme,
-  Drawer
 } from "@mui/material";
 
 import React, { useState, useEffect } from "react";
@@ -22,6 +21,8 @@ const Navbar = () => {
   const theme = useTheme();
   const isLarge = useMediaQuery(theme.breakpoints.up("lg"));
   const navigate = useNavigate();
+
+  // ------- Helpers -------
   const getToken = () => localStorage.getItem("token");
   const getUser = () => {
     const raw = localStorage.getItem("user");
@@ -32,12 +33,18 @@ const Navbar = () => {
     }
   };
 
-  const [token, setToken] = useState(getToken());
-  const [authUser, setAuthUser] = useState(getUser());
+  // ------- State -------
+  const [token, setToken] = useState<string | null>(getToken());
+  const [authUser, setAuthUser] = useState<any>(getUser());
+  const [selectedCategory, setSelectedCategory] = useState("men");
+  const [showCategorySheet, setShowCategorySheet] = useState(false);
+  const [openDrawer, setOpenDrawer] = useState(false);
 
+  // ------- Avatar Data -------
   const userName = authUser?.name || "User";
   const userImage = authUser?.profileImage || null;
 
+  // ------- Listen for ANY login/logout changes -------
   useEffect(() => {
     const updateAuth = () => {
       setToken(getToken());
@@ -48,15 +55,14 @@ const Navbar = () => {
     return () => window.removeEventListener("authChange", updateAuth);
   }, []);
 
-  const [selectedCategory, setSelectedCategory] = useState("men");
-  const [showCategorySheet, setShowCategorySheet] = useState(false);
-  const [openDrawer, setOpenDrawer] = useState(false);
-
   return (
     <>
       <Box className="fixed top-0 left-0 right-0 bg-white shadow-sm" sx={{ zIndex: 60 }}>
         <div className="flex items-center justify-between px-4 sm:px-6 md:px-10 lg:px-20 h-[70px] bg-white">
+
+          {/* ---------- LOGO + CATEGORY ---------- */}
           <div className="flex items-center gap-4 md:gap-9">
+
             <div className="flex items-center gap-2">
               {!isLarge && (
                 <IconButton onClick={() => setOpenDrawer(true)}>
@@ -65,8 +71,8 @@ const Navbar = () => {
               )}
 
               <h1
-                onClick={() => navigate("/")}
                 className="cursor-pointer text-xl md:text-2xl text-primary-color font-semibold"
+                onClick={() => navigate("/")}
               >
                 AnjaliCart
               </h1>
@@ -92,19 +98,18 @@ const Navbar = () => {
             )}
           </div>
 
-
+          {/* ---------- RIGHT SIDE ICONS ---------- */}
           <div className="flex items-center gap-1 sm:gap-3 md:gap-4 lg:gap-6">
 
             <IconButton><SearchIcon /></IconButton>
 
-
+            {/* ---------- USER / LOGIN ---------- */}
             {token ? (
               <Button className="flex items-center gap-2">
-
                 <Avatar
-                  onClick={() => navigate("/account/orders")}
                   sx={{ width: 32, height: 32 }}
                   src={userImage || undefined}
+                  onClick={() => navigate("/account/orders")}
                 >
                   {!userImage && userName.charAt(0).toUpperCase()}
                 </Avatar>
@@ -123,16 +128,13 @@ const Navbar = () => {
               </Button>
             )}
 
-
             <IconButton onClick={() => navigate("/wishlist")}>
               <FavoriteBorderIcon sx={{ fontSize: 26 }} />
             </IconButton>
 
-
             <IconButton onClick={() => navigate("/cart")}>
               <AddShoppingCartIcon sx={{ fontSize: 28 }} />
             </IconButton>
-
 
             {isLarge && (
               <Button
@@ -147,7 +149,7 @@ const Navbar = () => {
           </div>
         </div>
 
-
+        {/* ---------- CATEGORY DROPDOWN ---------- */}
         {isLarge && showCategorySheet && (
           <div
             className="fixed left-4 right-4 sm:left-6 sm:right-6 md:left-10 md:right-10 lg:left-20 lg:right-20
@@ -162,7 +164,7 @@ const Navbar = () => {
         )}
       </Box>
 
-
+      {/* filler height */}
       <div className="h-[70px]"></div>
     </>
   );

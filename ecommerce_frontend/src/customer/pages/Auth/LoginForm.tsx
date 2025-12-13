@@ -33,42 +33,81 @@ const LoginForm = () => {
     }
   };
 
+// const handleLogin = async () => {
+//     const isAdmin = email === ADMIN_EMAIL;
 
-  const handleLogin = async () => {
-    const isAdmin = email === ADMIN_EMAIL;
+//     try {
+//       const res = await api.post("/api/auth/signing", {
+//         email: email,                  // FIXED
+//         otp,
+//         role: isAdmin ? "ROLE_ADMIN" : "ROLE_CUSTOMER"
+//       });
 
-    try {
-      const res = await api.post("/api/auth/signing", {
-        email: email,                  // FIXED
-        otp,
-        role: isAdmin ? "ROLE_ADMIN" : "ROLE_CUSTOMER"
-      });
+//       const { jwt, role, id, name, profileImage } = res.data;
 
-      const { jwt, role, id, name, profileImage } = res.data;
+//       localStorage.setItem("token", jwt);
+//       localStorage.setItem("role", role);
 
-      localStorage.setItem("token", jwt);
-      localStorage.setItem("role", role);
+//       localStorage.setItem(
+//         "user",
+//         JSON.stringify({
+//           id,
+//           name,
+//           profileImage: profileImage || null,
+//         })
+//       );
 
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          id,
-          name,
-          profileImage: profileImage || null,
-        })
-      );
+//       window.dispatchEvent(new Event("authChange"));
 
-      window.dispatchEvent(new Event("authChange"));
+//       if (role === "ROLE_ADMIN") navigate("/admin");
+//       else if (role === "ROLE_SELLER") navigate("/seller");
+//       else navigate("/");
 
-      if (role === "ROLE_ADMIN") navigate("/admin");
-      else if (role === "ROLE_SELLER") navigate("/seller");
-      else navigate("/");
+//     } catch (error: any) {
+//       const msg = error.response?.data?.message || "Invalid OTP!";
+//       setErrorMsg(msg);
+//     }
+//   };
 
-    } catch (error: any) {
-      const msg = error.response?.data?.message || "Invalid OTP!";
-      setErrorMsg(msg);
-    }
-  };
+
+
+const handleLogin = async () => {
+  const isAdmin = email === ADMIN_EMAIL;
+
+  try {
+    const res = await api.post("/api/auth/signing", {
+      email,
+      otp,
+      role: isAdmin ? "ROLE_ADMIN" : "ROLE_CUSTOMER",
+    });
+
+    const { jwt, role, user } = res.data;
+
+    localStorage.setItem("token", jwt);
+    localStorage.setItem("role", role);
+
+    localStorage.setItem(
+      "user",
+      JSON.stringify({
+        id: user.id,
+        name: user.name,
+        profileImage: user.profileImage || null,
+      })
+    );
+
+    // 🔥 IMPORTANT: Trigger Navbar refresh
+    window.dispatchEvent(new Event("authChange"));
+
+    if (role === "ROLE_ADMIN") navigate("/admin");
+    else if (role === "ROLE_SELLER") navigate("/seller");
+    else navigate("/");
+
+  } catch (error: any) {
+    const msg = error.response?.data?.message || "Invalid OTP!";
+    setErrorMsg(msg);
+  }
+};
+
 
   return (
     <div>
