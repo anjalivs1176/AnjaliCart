@@ -41,7 +41,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "ESLINT_NO_DEV_ERRORS=true react-scripts build",
+    "build": "cross-env ESLINT_NO_DEV_ERRORS=true react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -66,6 +66,7 @@
   "devDependencies": {
     "@types/react-slick": "^0.23.13",
     "autoprefixer": "^10.4.22",
+    "cross-env": "^10.1.0",
     "init": "^0.1.2",
     "npx": "^10.2.2",
     "postcss": "^8.5.6",
